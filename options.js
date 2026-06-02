@@ -60,22 +60,27 @@ saveTokenBtn.addEventListener('click', () => {
     return;
   }
 
-  chrome.storage.sync.set({ token: raw }, () => {
-    flash('Token saved! Refreshing notifications…');
-    updateStatus();
-    chrome.runtime.sendMessage({ type: 'REFRESH' }, () => loadStatusCounts());
+  // Clear any stale "expired" flag so the new token gets a fresh chance.
+  chrome.storage.local.set({ authError: false }, () => {
+    chrome.storage.sync.set({ token: raw }, () => {
+      flash('Token saved! Refreshing notifications…');
+      updateStatus();
+      chrome.runtime.sendMessage({ type: 'REFRESH' }, () => loadStatusCounts());
+    });
   });
 });
 
 // ─── Remove token ────────────────────────────────────────────────────────────
 
 removeTokenBtn.addEventListener('click', () => {
-  chrome.storage.sync.remove('token', () => {
-    tokenInput.value = '';
-    flash('Token removed — now using session mode.', 'success');
-    sToken.textContent = 'Session mode (github.com login)';
-    sToken.className = 'status-value ok';
-    chrome.runtime.sendMessage({ type: 'REFRESH' }, () => loadStatusCounts());
+  chrome.storage.local.set({ authError: false }, () => {
+    chrome.storage.sync.remove('token', () => {
+      tokenInput.value = '';
+      flash('Token removed — now using session mode.', 'success');
+      sToken.textContent = 'Session mode (github.com login)';
+      sToken.className = 'status-value ok';
+      chrome.runtime.sendMessage({ type: 'REFRESH' }, () => loadStatusCounts());
+    });
   });
 });
 
@@ -123,19 +128,26 @@ function updateStatus() {
   chrome.storage.sync.get(
     { token: '', participatingOnly: false, desktopNotifications: false },
     (settings) => {
-    if (settings.token) {
-      // Mask token: show first 8 chars + ...
-      const masked = settings.token.slice(0, 8) + '••••••••••••••••';
-      tokenInput.value = settings.token;
-      sToken.textContent = `Configured (${masked})`;
-      sToken.className = 'status-value ok';
-    } else {
-      sToken.textContent = 'Session mode (github.com login)';
-      sToken.className = 'status-value ok';
-    }
+      chrome.storage.local.get({ authError: false }, ({ authError }) => {
+        if (settings.token) {
+          tokenInput.value = settings.token;
+          if (authError) {
+            sToken.textContent = 'Expired or invalid — update required';
+            sToken.className = 'status-value err';
+            flash('Your GitHub token has expired or is invalid. Please update it.', 'error');
+          } else {
+            const masked = settings.token.slice(0, 8) + '••••••••••••••••';
+            sToken.textContent = `Configured (${masked})`;
+            sToken.className = 'status-value ok';
+          }
+        } else {
+          sToken.textContent = 'Session mode (github.com login)';
+          sToken.className = 'status-value ok';
+        }
 
-      participatingCb.checked = settings.participatingOnly;
-      desktopCb.checked = settings.desktopNotifications;
+        participatingCb.checked = settings.participatingOnly;
+        desktopCb.checked = settings.desktopNotifications;
+      });
     },
   );
 }
@@ -154,6 +166,15 @@ function loadStatusCounts() {
     }
   });
 }
+
+// ─── React to background updates ────────────────────────────────────────────
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.authError) {
+    updateStatus();
+    loadStatusCounts();
+  }
+});
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 

@@ -35,6 +35,17 @@ async function getCachedNotifications() {
   return notifications;
 }
 
+/**
+ * Records whether the saved PAT is rejected by GitHub (expired / revoked /
+ * wrong scope). Surfaced in the options page, the popover and the popup so the
+ * user knows to update it. Cleared automatically on the next successful call.
+ */
+async function setAuthError(isError) {
+  const { authError = false } = await chrome.storage.local.get('authError');
+  if (authError === !!isError) return; // avoid redundant writes / change events
+  await chrome.storage.local.set({ authError: !!isError });
+}
+
 function findCached(notifications, id) {
   return notifications.find((n) => n.id === id || n._html_url === id);
 }
@@ -81,6 +92,16 @@ async function apiFetch(path, options = {}) {
       ...(options.headers || {}),
     },
   });
+
+  // 401 = bad credentials → the token is expired, revoked, or invalid.
+  if (response.status === 401) {
+    console.error('[GHN] GitHub token rejected (401) — expired, revoked, or invalid.');
+    await setAuthError(true);
+    return null;
+  }
+
+  // Got past 401, so the token authenticated fine — clear any prior error.
+  await setAuthError(false);
 
   if (!response.ok && response.status !== 204 && response.status !== 205) {
     console.error(`[GHN] API error ${response.status} for ${path}`);
@@ -308,9 +329,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   switch (message.type) {
     case 'GET_NOTIFICATIONS':
       chrome.storage.local
-        .get({ notifications: [], lastUpdated: null })
+        .get({ notifications: [], lastUpdated: null, authError: false })
         .then(sendResponse);
       return true;
+
+    case 'OPEN_OPTIONS':
+      chrome.runtime.openOptionsPage();
+      return false;
 
     case 'REFRESH':
       poll().then(() => sendResponse({ success: true }));

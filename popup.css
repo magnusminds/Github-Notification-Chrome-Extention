@@ -54,5 +54,8 @@ body {
     --color-shadow-medium: rgba(1, 4, 9, 0.4);
     --color-action-list-item-default-hover-bg: rgba(177, 186, 196, 0.12);
     --color-action-list-item-default-active-bg: rgba(177, 186, 196, 0.2);
+    --color-danger-fg: #f85149;
+    --color-danger-subtle: rgba(248, 81, 73, 0.1);
+    --color-danger-muted: rgba(248, 81, 73, 0.4);
   }
 }

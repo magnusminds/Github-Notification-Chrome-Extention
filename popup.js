@@ -89,9 +89,18 @@ function wireItem(itemEl, id) {
 
 // ─── Data flow ──────────────────────────────────────────────────────────────
 
+function showAuthBanner() {
+  if (bodyEl.querySelector('.ghn-auth-banner')) return;
+  bodyEl.insertAdjacentHTML('afterbegin', U.authBannerMarkup());
+  bodyEl.querySelector('#ghn-open-options')?.addEventListener('click', () => {
+    chrome.runtime.openOptionsPage();
+  });
+}
+
 async function load() {
   const result = await send({ type: 'GET_NOTIFICATIONS' });
   render(result?.notifications ?? []);
+  if (result?.authError) showAuthBanner();
 }
 
 async function refresh() {

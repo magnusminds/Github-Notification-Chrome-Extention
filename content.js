@@ -20,6 +20,7 @@
     itemMarkup,
     emptyMarkup,
     loadingMarkup,
+    authBannerMarkup,
   } = globalThis.GHN_UI;
 
   // ─── State ──────────────────────────────────────────────────────────────────
@@ -204,6 +205,17 @@
       cachedNotifications = result?.notifications ?? [];
       updateBadge(cachedNotifications.length);
       renderNotifications(cachedNotifications);
+      if (result?.authError) showAuthBanner();
+    });
+  }
+
+  /** Prepend the expired-token banner to the popover body. */
+  function showAuthBanner() {
+    const body = document.getElementById('ghn-body');
+    if (!body || body.querySelector('.ghn-auth-banner')) return;
+    body.insertAdjacentHTML('afterbegin', authBannerMarkup());
+    body.querySelector('#ghn-open-options')?.addEventListener('click', () => {
+      chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS' });
     });
   }
 

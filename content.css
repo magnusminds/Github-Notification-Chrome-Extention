@@ -359,6 +359,66 @@
   margin: 0;
 }
 
+/* ── Auth-error banner (expired token) ────────────────────────────────────── */
+
+.ghn-auth-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 0;
+  background: var(--color-danger-subtle, #ffebe9);
+  border-bottom: 1px solid var(--color-danger-muted, rgba(255, 129, 130, 0.4));
+  color: var(--color-fg-default, #1f2328);
+}
+
+.ghn-auth-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--color-danger-fg, #cf222e);
+}
+
+.ghn-auth-icon svg {
+  fill: currentColor;
+  display: block;
+}
+
+.ghn-auth-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ghn-auth-text strong {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.ghn-auth-text span {
+  font-size: 11.5px;
+  color: var(--color-fg-muted, #636c76);
+  line-height: 1.35;
+}
+
+.ghn-auth-btn {
+  flex-shrink: 0;
+  align-self: center;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--color-danger-fg, #cf222e);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.ghn-auth-btn:hover {
+  filter: brightness(1.05);
+}
+
 /* ── Footer ───────────────────────────────────────────────────────────────── */
 
 .ghn-footer {

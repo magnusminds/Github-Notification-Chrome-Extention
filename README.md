@@ -47,7 +47,9 @@ The extension works in **two modes**:
 | **Session mode** (default, no token) | Just be logged in to github.com | Fetches `github.com/notifications` with your session cookies and parses the page |
 | **API mode** (optional) | Save a Personal Access Token | Calls the GitHub REST API — faster, structured, supports the participating filter |
 
-**Session mode** needs no configuration — if you're signed in to GitHub in this browser, it just works.
+**The token always takes priority**: if a PAT is saved it's used; if not, the extension falls back to session mode automatically. **Session mode** needs no configuration — if you're signed in to GitHub in this browser, it just works.
+
+If a saved **token expires or is revoked**, GitHub rejects it with a `401` and the extension flags it: the options page shows *"Expired or invalid — update required"*, and the popover/popup show a banner with an **Update token** button. Notifications resume as soon as you paste a fresh token (or remove it to fall back to session mode).
 
 To use **API mode** instead:
 
