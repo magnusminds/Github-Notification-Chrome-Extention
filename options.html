@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub Notifier — Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="header-icon" aria-hidden="true">
+        <path d="M12 1a7 7 0 0 1 7 7v1.709c0 .216.065.427.187.606l2.562 3.844A1.75 1.75 0 0 1 20.28 17H3.72a1.75 1.75 0 0 1-1.469-2.841l2.563-3.844A1.75 1.75 0 0 0 5 9.709V8a7 7 0 0 1 7-7Zm0 19a3 3 0 0 0 2.83-2H9.17A3 3 0 0 0 12 20Z"/>
+      </svg>
+      <div>
+        <h1>GitHub Notifier</h1>
+        <p>Configure your notification preferences</p>
+      </div>
+    </header>
+
+    <div id="status-bar" class="status-bar" hidden></div>
+
+    <section class="section">
+      <h2 class="section-title">Authentication</h2>
+      <p class="section-desc">
+        A Personal Access Token is <strong>optional</strong>. Leave it blank to use
+        <strong>session mode</strong> — the extension reads your notifications straight from
+        <code>github.com/notifications</code> using your existing logged-in session, no token needed.
+        Add a token only if you want the faster, structured GitHub API (and the participating filter).
+        The token is stored locally in your browser and never shared.
+      </p>
+
+      <div class="field">
+        <label for="token" class="field-label">Personal Access Token</label>
+        <div class="token-row">
+          <input
+            type="password"
+            id="token"
+            class="input"
+            placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button class="btn btn-secondary" id="toggle-visibility" aria-label="Show token">
+            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="15" height="15">
+              <path d="M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.67 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.83.88 9.576.43 8.898a1.62 1.62 0 0 1 0-1.798c.45-.677 1.367-1.931 2.637-3.022C4.33 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.825 4.242 9.473 3.5 8 3.5c-1.473 0-2.824.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z"/>
+            </svg>
+          </button>
+        </div>
+        <p class="field-hint">
+          Optional — for API mode, create a token at
+          <a href="https://github.com/settings/tokens/new?scopes=notifications&description=GitHub+Notifier" target="_blank" rel="noopener">
+            github.com/settings/tokens
+          </a>
+          with the <code>notifications</code> scope. Leave blank to use session mode.
+        </p>
+      </div>
+
+      <button class="btn btn-primary" id="save-token-btn">Save Token</button>
+      <button class="btn btn-danger" id="remove-token-btn">Remove Token</button>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Notification Preferences</h2>
+
+      <div class="field field-row">
+        <div class="field-row-text">
+          <label for="participating-only" class="field-label">Participating notifications only</label>
+          <p class="field-hint no-mt">
+            Show only notifications where you are directly mentioned, assigned, or actively participating.
+          </p>
+        </div>
+        <label class="toggle" aria-label="Participating only">
+          <input type="checkbox" id="participating-only" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <div class="field field-row">
+        <div class="field-row-text">
+          <label for="desktop-notifications" class="field-label">Desktop notifications</label>
+          <p class="field-hint no-mt">
+            Show a browser notification when a new notification arrives. A burst of new items
+            is collapsed into a single summary.
+          </p>
+        </div>
+        <label class="toggle" aria-label="Desktop notifications">
+          <input type="checkbox" id="desktop-notifications" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Status</h2>
+      <div class="status-grid" id="status-grid">
+        <div class="status-item">
+          <span class="status-label">Token</span>
+          <span class="status-value" id="s-token">Not configured</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Unread notifications</span>
+          <span class="status-value" id="s-count">—</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Last polled</span>
+          <span class="status-value" id="s-last">Never</span>
+        </div>
+      </div>
+      <button class="btn btn-secondary" id="refresh-btn" style="margin-top:12px">
+        Refresh now
+      </button>
+    </section>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

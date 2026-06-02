@@ -1,0 +1,58 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   popup.css — toolbar-icon popup
+   Sizing + theming on top of the shared content.css classes. content.css uses
+   GitHub CSS variables with light-mode fallbacks; here we (a) size the popup and
+   (b) supply the dark-theme variables when the OS prefers dark, so the popup
+   matches GitHub's look on its own page (no github.com host to inherit from).
+   ───────────────────────────────────────────────────────────────────────────── */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#ghn-popup-root {
+  width: 380px;
+  max-height: 580px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-canvas-overlay, #fff);
+  color: var(--color-fg-default, #1f2328);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+}
+
+/* In the popup the list can use more height than the in-page popover. */
+#ghn-popup-root .ghn-body {
+  max-height: 470px;
+}
+
+/* Actions are hover-revealed on the page; in a popup keep them always visible
+   so they're reachable without precise hovering in the small window. */
+#ghn-popup-root .ghn-item-actions {
+  opacity: 1;
+}
+
+/* ── Dark theme (OS preference) ───────────────────────────────────────────── */
+
+@media (prefers-color-scheme: dark) {
+  #ghn-popup-root {
+    --color-canvas-default: #0d1117;
+    --color-canvas-overlay: #161b22;
+    --color-border-default: #30363d;
+    --color-border-muted: #21262d;
+    --color-fg-default: #e6edf3;
+    --color-fg-muted: #7d8590;
+    --color-fg-subtle: #6e7681;
+    --color-accent-fg: #2f81f7;
+    --color-open-fg: #3fb950;
+    --color-done-fg: #a371f7;
+    --color-neutral-muted: rgba(110, 118, 129, 0.4);
+    --color-shadow-large: rgba(1, 4, 9, 0.5);
+    --color-shadow-medium: rgba(1, 4, 9, 0.4);
+    --color-action-list-item-default-hover-bg: rgba(177, 186, 196, 0.12);
+    --color-action-list-item-default-active-bg: rgba(177, 186, 196, 0.2);
+  }
+}

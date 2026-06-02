@@ -1,0 +1,355 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   GitHub Notifier — options.css
+   ───────────────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --fg: #1f2328;
+  --fg-muted: #636c76;
+  --bg: #ffffff;
+  --bg-subtle: #f6f8fa;
+  --border: #d0d7de;
+  --border-muted: #eaeef2;
+  --accent: #0969da;
+  --accent-hover: #0550ae;
+  --danger: #cf222e;
+  --danger-hover: #a40e26;
+  --shadow-sm: 0 1px 0 rgba(31,35,40,0.04);
+  --radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e6edf3;
+    --fg-muted: #848d97;
+    --bg: #0d1117;
+    --bg-subtle: #161b22;
+    --border: #30363d;
+    --border-muted: #21262d;
+    --accent: #2f81f7;
+    --accent-hover: #1f6feb;
+    --danger: #f85149;
+    --danger-hover: #da3633;
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.5;
+  min-width: 520px;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+/* ── Page header ────────────────────────────────────────────────────────────── */
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-icon {
+  width: 36px;
+  height: 36px;
+  fill: var(--fg);
+  flex-shrink: 0;
+}
+
+.page-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.page-header p {
+  font-size: 13px;
+  color: var(--fg-muted);
+  margin-top: 2px;
+}
+
+/* ── Status bar (flash messages) ────────────────────────────────────────────── */
+
+.status-bar {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+}
+
+.status-bar.success {
+  background: #dafbe1;
+  border-color: #2da44e;
+  color: #116329;
+}
+
+.status-bar.error {
+  background: #fff0ee;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-bar.success {
+    background: #1a4428;
+    border-color: #2ea043;
+    color: #3fb950;
+  }
+  .status-bar.error {
+    background: #3d1f24;
+    border-color: #da3633;
+    color: #f85149;
+  }
+}
+
+/* ── Sections ───────────────────────────────────────────────────────────────── */
+
+.section {
+  margin-bottom: 32px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-subtle);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: var(--fg-muted);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+/* ── Fields ─────────────────────────────────────────────────────────────────── */
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--fg-muted);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.field-hint.no-mt { margin-top: 2px; }
+
+.field-hint a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.field-hint a:hover { text-decoration: underline; }
+
+.field-hint code {
+  background: var(--border-muted);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  border: 1px solid var(--border);
+}
+
+.field-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.field-row-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Token input row ─────────────────────────────────────────────────────────── */
+
+.token-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Inputs ─────────────────────────────────────────────────────────────────── */
+
+.input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 100ms, box-shadow 100ms;
+  width: 100%;
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 100ms, border-color 100ms;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.btn + .btn { margin-left: 8px; }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--bg);
+  color: var(--fg);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.btn-secondary:hover {
+  background: var(--bg-subtle);
+}
+
+.btn-danger {
+  background: var(--bg);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn-danger:hover {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* ── Toggle switch ──────────────────────────────────────────────────────────── */
+
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 10px;
+  transition: background 150ms;
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 150ms;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle input:checked + .toggle-track {
+  background: var(--accent);
+}
+
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(16px);
+}
+
+.toggle input:focus-visible + .toggle-track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Status grid ─────────────────────────────────────────────────────────────── */
+
+.status-grid {
+  display: grid;
+  gap: 1px;
+  background: var(--border-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg);
+  font-size: 13px;
+}
+
+.status-label {
+  color: var(--fg-muted);
+  font-weight: 500;
+}
+
+.status-value {
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.status-value.ok   { color: #1a7f37; }
+.status-value.warn { color: #9a6700; }
+.status-value.err  { color: var(--danger); }

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GitHub Notifier — parser</title>
+</head>
+<body>
+  <!--
+    Invisible offscreen document.
+    Its only job is to parse the github.com/notifications HTML with DOMParser
+    (which is unavailable inside an MV3 service worker) and return the
+    extracted notification list to background.js.
+  -->
+  <script src="offscreen.js"></script>
+</body>
+</html>

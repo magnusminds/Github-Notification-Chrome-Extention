@@ -11,6 +11,7 @@ A Chrome (Manifest V3) browser extension that shows your GitHub notifications in
 | **Unread badge** | Red count badge on the bell icon updates every 60 s |
 | **Hover popover** | Mouse over the bell → instant notification list |
 | **Toolbar popup** | Click the extension icon → the same notification list in a popup |
+| **Desktop alerts** | Optional browser notification when new notifications arrive — toggle in Options |
 | **Notification types** | Issues, Pull Requests, Discussions, Releases, Commits — each with the correct icon |
 | **Reason badges** | Shows why you were notified (Mentioned, Assigned, Review requested, …) |
 | **Mark as read** | Per-item ✓ button or "mark all" in the header |
@@ -86,7 +87,7 @@ Github-Notifier/
 | `storage` | Sync token/settings; cache notifications locally |
 | `alarms` | 60-second poll interval |
 | `tabs` | Push badge updates to open GitHub tabs |
-| `notifications` | (reserved for future desktop alerts) |
+| `notifications` | Desktop alerts when new notifications arrive (opt-in) |
 | `offscreen` | Parse the notifications page HTML off the service worker (session mode) |
 | `https://api.github.com/*` | GitHub REST API calls (API mode) |
 | `https://github.com/*` | Content script host + reading the notifications page (session mode) |
@@ -100,4 +101,5 @@ In **API mode**, the token is stored in `chrome.storage.sync` (encrypted by Chro
 - **Polling interval**: 60 s via `chrome.alarms`. GitHub recommends ≥ 60 s.
 - **GitHub's dark/dimmed themes**: The popover uses `var(--color-canvas-overlay)` and friends — no extra theme detection needed.
 - **Turbo navigation**: The `MutationObserver` in `content.js` re-injects the badge when GitHub swaps the header during client-side navigation.
+- **Desktop alerts**: off by default. Each poll diffs the current thread ids against a `seenIds` baseline in `chrome.storage.local`; only genuinely new ids fire a notification. The first poll just records the baseline (so it never dumps the whole inbox), and the baseline advances every poll even while alerts are off — so enabling the toggle never replays a backlog. The notification's id is its click-through URL, so clicking opens the thread. A burst of >1 new item collapses into one summary alert.
 - **Session-mode parsing**: `offscreen.js` extracts notifications from the page HTML in an href-driven way — repo, type and URL come from each notification's own link, so it tolerates GitHub's CSS/class renames. Mark-as-read / unsubscribe in session mode work by *replaying the page's own forms* (with their real `authenticity_token`) rather than calling private endpoints. If GitHub changes that markup, those actions degrade gracefully (the item simply isn't removed) and log a `[GHN]` warning to the service-worker console.
