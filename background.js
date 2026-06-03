@@ -46,6 +46,26 @@ async function setAuthError(isError) {
   await chrome.storage.local.set({ authError: !!isError });
 }
 
+/**
+ * Optimistic read-state: thread ids we've marked read locally, mapped to the
+ * time we marked them. GitHub's notifications list is cached server-side (~60s),
+ * so a just-read thread can still come back on the next poll and resurrect
+ * itself. We suppress such threads until the server stops returning them — but
+ * still let one through if it has *newer* activity than when we read it.
+ */
+async function getReadState() {
+  const { readState = {} } = await chrome.storage.local.get('readState');
+  return readState;
+}
+
+async function recordRead(ids) {
+  if (!ids.length) return;
+  const readState = await getReadState();
+  const now = Date.now();
+  for (const id of ids) readState[id] = now;
+  await chrome.storage.local.set({ readState });
+}
+
 function findCached(notifications, id) {
   return notifications.find((n) => n.id === id || n._html_url === id);
 }
@@ -298,8 +318,27 @@ async function updateBadge(count) {
 // ─── Polling ──────────────────────────────────────────────────────────────────
 
 async function poll() {
-  const notifications = await fetchNotifications();
-  if (notifications === null) return; // not authenticated / fetch error
+  const fetched = await fetchNotifications();
+  if (fetched === null) return; // not authenticated / fetch error
+
+  // Hide threads we've locally marked read until GitHub's cached list catches
+  // up, so a just-read item doesn't resurrect itself on the next poll.
+  const readState = await getReadState();
+  const survivingReadState = {};
+  const notifications = [];
+  for (const n of fetched) {
+    const markedAt = readState[n.id];
+    if (markedAt !== undefined) {
+      const activityAt = n.updated_at ? new Date(n.updated_at).getTime() : 0;
+      if (activityAt <= markedAt) {
+        survivingReadState[n.id] = markedAt; // still read — keep suppressing
+        continue;
+      }
+      // Newer activity than when we read it → let it resurface (drop the entry).
+    }
+    notifications.push(n);
+  }
+  await chrome.storage.local.set({ readState: survivingReadState });
 
   await maybeNotify(notifications);
   await chrome.storage.local.set({ notifications, lastUpdated: Date.now() });
@@ -346,6 +385,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         const cached = await getCachedNotifications();
         const result = await markThreadRead(message.threadId, cached);
         if (!result) return sendResponse({ success: false });
+        await recordRead([message.threadId]);
         await removeFromCacheAndRespond(message.threadId, sendResponse);
       })();
       return true;
@@ -355,17 +395,21 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         const cached = await getCachedNotifications();
         const result = await unsubscribeThread(message.threadId, cached);
         if (!result) return sendResponse({ success: false });
+        await recordRead([message.threadId]);
         await removeFromCacheAndRespond(message.threadId, sendResponse);
       })();
       return true;
 
     case 'MARK_ALL_READ':
-      markAllRead().then(async (result) => {
+      (async () => {
+        const cached = await getCachedNotifications();
+        const result = await markAllRead();
         if (!result) return sendResponse({ success: false });
+        await recordRead(cached.map((n) => n.id));
         await chrome.storage.local.set({ notifications: [] });
         await updateBadge(0);
         sendResponse({ success: true, notifications: [] });
-      });
+      })();
       return true;
   }
 });
